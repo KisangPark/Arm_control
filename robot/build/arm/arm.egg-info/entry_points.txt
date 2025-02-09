@@ -1,0 +1,5 @@
+[console_scripts]
+get_frame = arm.get_frame:main
+make_action = arm.make_action:main
+servo_control = arm.servo_control:main
+
