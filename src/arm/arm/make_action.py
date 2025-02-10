@@ -50,7 +50,7 @@ class MAKE_ACTION(Node):
         qos_profile = QoSProfile(depth=10)
 
         #get pytorch layer
-        self.actor = ACTOR()
+        self.actor = ACTOR(state_dim, action_dim)
 
         #subscriber
         self.subscription = self.create_subscription(
@@ -84,7 +84,7 @@ class MAKE_ACTION(Node):
 def main(args=None):
     #main function call
     rclpy.init(args=args)
-    node = MAKE_ACTION(state_dim, action_dim)
+    node = MAKE_ACTION()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
