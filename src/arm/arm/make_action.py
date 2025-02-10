@@ -21,6 +21,9 @@ from std_msgs.msg import Float32MultiArray
 from std_msgs.msg import Int32
 from rclpy.qos import QoSProfile
 
+state_dim = 13
+action_dim = 27
+
 
 
 def select_action(vector):
@@ -81,7 +84,7 @@ class MAKE_ACTION(Node):
 def main(args=None):
     #main function call
     rclpy.init(args=args)
-    node = MAKE_ACTION()
+    node = MAKE_ACTION(state_dim, action_dim)
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()

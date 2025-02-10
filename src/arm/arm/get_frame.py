@@ -96,7 +96,7 @@ class GET_FRAME(Node):
         qos_profile = QoSProfile(depth=10)
 
         #cv video capture
-        self.cap = cv2.videocapture('/dev/video1')
+        self.cap = cv2.VideoCapture('/dev/video1')
 
         #subscriber
         self.subscription = self.create_subscription(
