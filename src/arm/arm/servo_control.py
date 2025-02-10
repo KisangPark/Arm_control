@@ -11,8 +11,8 @@ Requirements
 from urdf_parser_py.urdf import URDF
 import os
 from ament_index_python.packages import get_package_share_directory
-pkg_path = os.path.join(get_package_share_directory('gazebo_tutorial'))
-urdf_file = os.path.join(pkg_path, "vision60", "vision60_single.urdf")
+pkg_path = os.path.join(get_package_share_directory('arm'))
+urdf_file = os.path.join(pkg_path, "arm", "arm.xacro")
 robot = URDF.from_xml_file(urdf_file)
 
 #2. extract joint informations

@@ -34,6 +34,7 @@ def detect_red_box(frame):
     mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
     mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
     red_mask = cv2.bitwise_or(mask1, mask2)
+    cv2.imshow(red_mask)
 
     # Find contours in the mask
     contours, _ = cv2.findContours(red_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -59,9 +60,7 @@ def detect_red_box(frame):
 #green dot - robot tip detection
 #return vector of position
 
-def detect_green_dot(image_path):
-    # Load the image
-    image = cv2.imread(image_path)
+def detect_green_dot(image):
     
     # Convert the image to HSV color space
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -72,6 +71,7 @@ def detect_green_dot(image_path):
     
     # Create a mask for green color
     mask = cv2.inRange(hsv, lower_green, upper_green)
+    cv2.imshow(mask)
     
     # Find contours in the mask
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
