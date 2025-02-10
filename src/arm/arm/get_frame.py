@@ -116,6 +116,7 @@ class GET_FRAME(Node):
         try:
             ret, frame = self.cap.read()
             cv2.imshow('test', frame)
+            cv2.waitKey(1)
             #process image -> get coordinate of vertices, 4x2 matrix
             vertex_list = detect_red_box(frame)
             #get coordinate of arm tip, 1x2 vector
