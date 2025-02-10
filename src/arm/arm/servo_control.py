@@ -7,31 +7,7 @@ Requirements
 3) spinning -> every spin, send request, publish servo position
 """
 
-#1. urdf parsing
-from urdf_parser_py.urdf import URDF
-import os
-from ament_index_python.packages import get_package_share_directory
-pkg_path = os.path.join(get_package_share_directory('arm'))
-urdf_file = os.path.join(pkg_path, "xacro", "arm.xacro")
-robot = URDF.from_xml_file(urdf_file)
-
-#2. extract joint informations
-joint_names = []
-joint_types = {}
-joint_limits = {}
-
-for joint in robot.joints:
-    if joint.type != "fixed":
-        joint_names.append(joint.name)
-        joint_types[joint.name] = joint.type
-        if joint.limit:
-            joint_limits[joint.name] = {
-                "lower": joint.limit.lower,
-                "upper": joint.limit.upper,
-                "effort": joint.limit.effort,
-                "velocity": joint.limit.velocity
-            }
-
+joint_names = ['bodyjoint_1', 'bodyjoint_2', 'bodyjoint_3']
 length = len(joint_names)
 print(joint_names)
 
