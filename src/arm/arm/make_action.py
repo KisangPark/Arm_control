@@ -53,41 +53,29 @@ class MAKE_ACTION(Node):
         self.subscription = self.create_subscription(
             Float32MultiArray,
             '/state', # length 18 array state
-            self.sub_callback,
+            self.forwarding,
             qos_profile)
         self.subscription
 
         #service server
-        self.service = self.create_service(Int32, 'action', self.service_callback)
+        self.publisher = self.create_publisher(Int32, 'action', qos_profile)
 
-
-    def sub_callback(self,msg):
-        #ros2 data to pytorch tensor
-        self.state = np.array(msg.data)
-        self.state = torch.from_numpy(self.state)
-        #torch tensor loaded on self state
-
-
-    def forwarding(self, state):
+    def forwarding(self, msg):
         self.get_logger().info('state received, forwarding...')
         
+        self.state = np.array(msg.data)
+        self.state = torch.from_numpy(self.state)
+
         #forward through network
-        result_probability = self.actor(state).numpy()
+        result_probability = self.actor(self.state).numpy()
 
         #choose the highest among probabilities (make it integer)
-        return result_probability.argmax().item()
+        index = result_probability.argmax().item()
 
-
-    def service_callback(self, request, response):
-        #if request, forward & return index information in integer
-
-        if request: # boolean decision
-            response = self.forwarding(self.state)
-        else: #if false request
-            print("false request")
-
-        return response    
-
+        #publish
+        act = Int32()
+        act.data = index
+        self.publisher.publish(act)
 
 
 def main(args=None):

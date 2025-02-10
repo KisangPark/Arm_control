@@ -7,12 +7,36 @@ Requirements
 3) spinning -> every spin, send request, publish servo position
 """
 
-import RPi.GPIO as GPIO
+#1. urdf parsing
+from urdf_parser_py.urdf import URDF
+import os
+from ament_index_python.packages import get_package_share_directory
+pkg_path = os.path.join(get_package_share_directory('arm'))
+urdf_file = os.path.join(pkg_path, "xacro", "arm.xacro")
+robot = URDF.from_xml_file(urdf_file)
 
-import numpy as np
-import torch
-import torch.nn as nn
-import torch.optim as optim
+#2. extract joint informations
+joint_names = []
+joint_types = {}
+joint_limits = {}
+
+for joint in robot.joints:
+    if joint.type != "fixed":
+        joint_names.append(joint.name)
+        joint_types[joint.name] = joint.type
+        if joint.limit:
+            joint_limits[joint.name] = {
+                "lower": joint.limit.lower,
+                "upper": joint.limit.upper,
+                "effort": joint.limit.effort,
+                "velocity": joint.limit.velocity
+            }
+
+length = len(joint_names)
+print(joint_names)
+
+
+import RPi.GPIO as GPIO
 
 import rclpy
 from rclpy.node import Node
@@ -20,9 +44,9 @@ from std_msgs.msg import Float32MultiArray
 from std_msgs.msg import Int32
 from rclpy.qos import QoSProfile
 
-servoPin1          = 12
-servoPin2          = 13
-servoPin3          = 14
+servoPin1          = 8
+servoPin2          = 10
+servoPin3          = 12
 
 SERVO_MAX_DUTY    = 12   # duty for 180 degree
 SERVO_MIN_DUTY    = 3    # duty for 0 degree
@@ -51,9 +75,9 @@ def select_action(index):
 
 
 
-class MAKE_ACTION(Node):
+class SERVO_CONTROL(Node):
     def __init__(self):
-        super().__init__('make_action')
+        super().__init__('servo_control')
         
         qos_profile = QoSProfile(depth=10)
 
@@ -71,33 +95,55 @@ class MAKE_ACTION(Node):
         servo2.start(0)
         servo3.start(0)
 
-        #service client
-        #?
+        #subscriber
+        self.subscription = self.create_subscription(
+            Int32,
+            '/action', # integer of action index
+            self.action_callback,
+            qos_profile
+        )
+        self.subscription
+        
+        #publish angle value of servos, float array
+        self.publisher_sai = self.create_publisher(Float32MultiArray, 'angle', qos_profile)
 
-        #publish servo angle, float array
-        #self.publisher = 
+        #publish JointState for rviz & robot state publisher
+        self.publisher_js = self.create_publisher(JointState, 'joint_states', qos_profile)
+
 
         #initialize angle with 90
-        self.angle = [90, 90, 90]
+        # important: servo value is modified as 0~180 on code,
+        #              but in xacro it's -90~90
+        self.servo_angle = [90, 90, 90]
+        self.joint_state = [0,0,0]
 
+        self.sai = Float32MultiArray()#servo angle info initialize
+        self.js = JointState()#joint state initialize
+        self.js.header.frame_id = "joint_states"
+        self.js.name = joint_names
+        self.js.position = np.zeros(length).tolist()
 
-    def action_client(self,msg):
-        #request for action index
-        #send request
+    def action_callback(self,msg):
 
-        #calculate self angle
-        action_arr = select_action(msg.data)
-        for i, value in enumerate(action_arr):
-            self.angle[i] = max(0, min(180, self.angle[i] + value)) #cat
+        #1) calculate self angle
+        action_list = select_action(msg.data)
+        for i, value in enumerate(action_list):
+            self.servo_angle[i] = max(0, min(180, self.servo_angle[i] + value)) #cat
+            self.joint_state[i] = max(-90, min(90, self.joint_state[i] + value)) #cat
 
-        #call gpio control method
+        #2) call gpio control method
         self.servo_signal()
 
-        #create message
-        msg = Float32MultiArray()
-        msg.data = self.angle
+        #3) create message
+        self.sai.data = self.servo_angle
         #publish angle
-        publish(msg)
+        self.publisher_sai.publish(self.sai)
+
+        #4) create JointState
+        self.js.position = self.joint_state
+        self.js.effort = []
+        self.js.velocity = []
+        self.publisher_js.publish(self.js)
 
 
     def servo_signal(self):
@@ -114,7 +160,7 @@ class MAKE_ACTION(Node):
 def main(args=None):
     #main function call
     rclpy.init(args=args)
-    node = MAKE_ACTION()
+    node = SERVO_CONTROL()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()

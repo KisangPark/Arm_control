@@ -14,6 +14,8 @@ setup(
         ('share/' + package_name, ['package.xml']),
         #launch folder
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
+        #xacro folder
+        (os.path.join('share', package_name, 'xacro'), glob('xacro/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

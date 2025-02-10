@@ -18,6 +18,8 @@ from rclpy.qos import QoSProfile
 
 
 #red box detection
+#return 4x2 matrix for edge position
+
 def detect_red_box(frame):
     # Load image and convert to HSV color space
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -53,7 +55,10 @@ def detect_red_box(frame):
     return None
 
 
+
 #green dot - robot tip detection
+#return vector of position
+
 def detect_green_dot(image_path):
     # Load the image
     image = cv2.imread(image_path)
@@ -80,18 +85,18 @@ def detect_green_dot(image_path):
         if M["m00"] != 0:
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
-            return (cX, cY)
+            return [cX, cY]
     
     return None
 
 
-class GET_STATE(Node):
+class GET_FRAME(Node):
     def __init__(self):
         super().__init__('get_frame')
         qos_profile = QoSProfile(depth=10)
 
         #cv video capture
-        self.cap = cv2.videocapture(0)
+        self.cap = cv2.videocapture('/dev/video1')
 
         #subscriber
         self.subscription = self.create_subscription(
@@ -112,47 +117,31 @@ class GET_STATE(Node):
         #read camera
         try:
             ret, frame = self.cap.read()
+            #process image -> get coordinate of vertices, 4x2 matrix
+            vertex_list = detect_red_box(frame)
+            #get coordinate of arm tip, 1x2 vector
+            arm_tip = detect_green_dot(frame)
+
+            # append all
+            state = vertex_list.flatten()
+            state.append(arm_tip.flatten())
+            state.append(np.array(msg.data)) #angle info received
+
         except:
             print("cap not opened")
-
-        #process image -> get coordinate of vertices
-        vertex_list = detect_red_box(frame)
-
-        #get coordinate of arm tip
-        arm_tip = detect_green_dot(frame)
-
-        # append all
-        state = vertex_list
-        state.append(arm_tip)
-        state.append(msg.data)
+            state = []
 
         #publish
         state_array = Float32MultiArray()
-        state_array.data = state
+        state_array.data = np.float32(state)
         self.publisher.publish(state_array)
-
-    def get_green_pixel(self, image):
-        MIN_VALUE = np.array([0, 100, 0], np.uint8)
-        MAX_VALUE = np.array([100, 255, 100], np.uint8)
-
-        sorted = cv2.inRange(image, MIN_VALUE, MAX_VALUE)
-        pixel_num = cv2.countNonZero(sorted)
-
-        #percentage?
-        height, width, channels = image.shape
-        percent = pixel_num/(height*width)
-
-        print('green pixel number:', str(pixel_num), ",", str(percent))
-
-        return pixel_num, percent
-
 
 
 
 def main(args=None):
     #main function call
     rclpy.init(args=args)
-    node = GET_STATE()
+    node = GET_FRAME()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
