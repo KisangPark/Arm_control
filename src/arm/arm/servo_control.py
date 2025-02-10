@@ -132,7 +132,7 @@ class SERVO_CONTROL(Node):
             self.joint_state[i] = max(-90, min(90, self.joint_state[i] + value)) #cat
 
         #2) call gpio control method
-        self.servo_signal()
+        #self.servo_signal()
 
         #3) create message
         self.sai.data = self.servo_angle
