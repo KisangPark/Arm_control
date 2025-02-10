@@ -34,7 +34,6 @@ def detect_red_box(frame):
     mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
     mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
     red_mask = cv2.bitwise_or(mask1, mask2)
-    cv2.imshow(red_mask)
 
     # Find contours in the mask
     contours, _ = cv2.findContours(red_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -71,7 +70,6 @@ def detect_green_dot(image):
     
     # Create a mask for green color
     mask = cv2.inRange(hsv, lower_green, upper_green)
-    cv2.imshow(mask)
     
     # Find contours in the mask
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -117,6 +115,7 @@ class GET_FRAME(Node):
         #read camera
         try:
             ret, frame = self.cap.read()
+            cv2.imshow('test', frame)
             #process image -> get coordinate of vertices, 4x2 matrix
             vertex_list = detect_red_box(frame)
             #get coordinate of arm tip, 1x2 vector
