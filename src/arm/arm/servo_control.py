@@ -14,6 +14,7 @@ print(joint_names)
 
 import RPi.GPIO as GPIO
 
+import numpy as np
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
