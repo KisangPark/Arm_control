@@ -58,18 +58,18 @@ class SERVO_CONTROL(Node):
         qos_profile = QoSProfile(depth=10)
 
         #setup GPIO
-        GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(servoPin1, GPIO.OUT)
-        GPIO.setup(servoPin2, GPIO.OUT)
-        GPIO.setup(servoPin3, GPIO.OUT)
+        #GPIO.setmode(GPIO.BOARD)
+        #GPIO.setup(servoPin1, GPIO.OUT)
+        #GPIO.setup(servoPin2, GPIO.OUT)
+        #GPIO.setup(servoPin3, GPIO.OUT)
 
         #servo motor definition
-        servo1 = GPIO.PWM(servoPin1, 50)
-        servo2 = GPIO.PWM(servoPin2, 50)
-        servo3 = GPIO.PWM(servoPin3, 50)
-        servo1.start(0)
-        servo2.start(0)
-        servo3.start(0)
+        #servo1 = GPIO.PWM(servoPin1, 50)
+        #servo2 = GPIO.PWM(servoPin2, 50)
+        #servo3 = GPIO.PWM(servoPin3, 50)
+        #servo1.start(0)
+        #servo2.start(0)
+        #servo3.start(0)
 
         #subscriber
         self.subscription = self.create_subscription(
