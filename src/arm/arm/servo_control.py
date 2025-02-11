@@ -16,6 +16,7 @@ import RPi.GPIO as GPIO
 
 import rclpy
 from rclpy.node import Node
+from sensor_msgs.msg import JointState
 from std_msgs.msg import Float32MultiArray
 from std_msgs.msg import Int32
 from rclpy.qos import QoSProfile
