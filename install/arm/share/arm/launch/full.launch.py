@@ -16,6 +16,18 @@ from launch_ros.substitutions import FindPackageShare
 import xacro
 
 def generate_launch_description():
+    package_name = "arm"
+
+    #robot state publisher, launch
+    rsp = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [os.path.join(get_package_share_directory(package_name), "launch", "xacro_load.launch.py")]
+        ),
+        launch_arguments={"use_sim_time": "true"}.items(),
+    )
+
+    #workspace package
+    pkg_path = os.path.join(get_package_share_directory('arm'))
 
     #get_frame node
     get_frame = Node(
@@ -43,6 +55,7 @@ def generate_launch_description():
             get_frame,
             make_action,
             servo_control,
+            rsp,
         ]
     )
 

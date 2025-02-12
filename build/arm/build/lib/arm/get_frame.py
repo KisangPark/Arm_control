@@ -13,11 +13,13 @@ import numpy as np
 import cv2
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Float32MultiArray #Float32MultiArray
 from rclpy.qos import QoSProfile
 
 
 #red box detection
+#return 4x2 matrix for edge position
+
 def detect_red_box(frame):
     # Load image and convert to HSV color space
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -53,10 +55,11 @@ def detect_red_box(frame):
     return None
 
 
+
 #green dot - robot tip detection
-def detect_green_dot(image_path):
-    # Load the image
-    image = cv2.imread(image_path)
+#return vector of position
+
+def detect_green_dot(image):
     
     # Convert the image to HSV color space
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -80,24 +83,26 @@ def detect_green_dot(image_path):
         if M["m00"] != 0:
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
-            return (cX, cY)
+            return [cX, cY]
     
     return None
 
 
-class GET_STATE(Node):
+class GET_FRAME(Node):
     def __init__(self):
         super().__init__('get_frame')
         qos_profile = QoSProfile(depth=10)
 
         #cv video capture
-        self.cap = cv2.videocapture(0)
+        #self.cap = cv2.VideoCapture(0) # '/dev/video1' #*********************************************************************************
+        #alter: image of red box and green dot
+        self.image = cv2.imread('/home/kisangpark/Arm_control/src/arm/redbox_greendot.jpg')
 
         #subscriber
         self.subscription = self.create_subscription(
             Float32MultiArray,
             '/angle', # length 3 vector of integer angles
-            self.get_frame,
+            self.record_angle,
             qos_profile
         )
         self.subscription #prevent unused variable warning
@@ -106,53 +111,55 @@ class GET_STATE(Node):
         self.publisher = self.create_publisher(Float32MultiArray,
         'state', qos_profile)
 
-    def get_frame(self, msg):
+        #set timer
+        self.timer = self.create_timer(0.1, self.get_frame)
+
+
+    def record_angle(self, msg):
         self.get_logger().info('angle received from controller')
-        
+        self.servo_angle = msg.data
+        #record angle from subscription
+
+
+    def get_frame(self):
         #read camera
         try:
-            ret, frame = self.cap.read()
+            frame = self.image
+            #ret, frame = self.cap.read()   #*********************************************************************************
+            #cv2.imshow('test', frame) #works only when run separately
+            #cv2.waitKey(1)
+            #process image -> get coordinate of vertices, 4x2 matrix
+            vertex_list = detect_red_box(frame) # ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!
+            #get coordinate of arm tip, 1x2 vector
+            arm_tip = detect_green_dot(frame)
+
+            self.get_logger().info("got box and dot")
+
+            # append all
+            state = np.array(vertex_list).flatten().tolist()
+            state += arm_tip
+            try:
+                state += self.servo_angle #angle info received
+                self.get_logger().info("servo angle appended")
+            except:
+                state += np.zeros(3).tolist()
+
         except:
-            print("cap not opened")
-
-        #process image -> get coordinate of vertices
-        vertex_list = detect_red_box(frame)
-
-        #get coordinate of arm tip
-        arm_tip = detect_green_dot(frame)
-
-        # append all
-        state = vertex_list
-        state.append(arm_tip)
-        state.append(msg.data)
+            self.get_logger().info("cap not opened")
+            state = np.zeros(13)
 
         #publish
         state_array = Float32MultiArray()
-        state_array.data = state
+        state_array.data = np.float32(state).tolist()
+        #self.get_logger().info('successfully transitioned, publishing...')
         self.publisher.publish(state_array)
-
-    def get_green_pixel(self, image):
-        MIN_VALUE = np.array([0, 100, 0], np.uint8)
-        MAX_VALUE = np.array([100, 255, 100], np.uint8)
-
-        sorted = cv2.inRange(image, MIN_VALUE, MAX_VALUE)
-        pixel_num = cv2.countNonZero(sorted)
-
-        #percentage?
-        height, width, channels = image.shape
-        percent = pixel_num/(height*width)
-
-        print('green pixel number:', str(pixel_num), ",", str(percent))
-
-        return pixel_num, percent
-
 
 
 
 def main(args=None):
     #main function call
     rclpy.init(args=args)
-    node = GET_STATE()
+    node = GET_FRAME()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()

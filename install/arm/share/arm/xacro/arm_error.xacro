@@ -5,7 +5,7 @@
     <xacro:include filename="macros.xacro"/>
 
     <!-- materials -->
-    <material name="red"><color rgba="0 1 0 1"/></material>
+    <material name='red'><color rgba="1 0 0 1"/></material>
     <material name="white"><color rgba="1 1 1 1"/></material>
     <material name="blue"><color rgba="0 0 1 1"/></material>
     <material name="black"><color rgba="0 0 0 1"/></material>
@@ -27,11 +27,11 @@
             <material name="blue"/>
         </visual>
         <collision>
-            <origin xyz="0 0 0"/>
+            <origin xyz="0 0 0.1"/>
             <geometry><box size="0.25 0.35 0"/></geometry>
         </collision>
         <xacro:inertial_box mass="0.5" x="0.2" y="0.1" z="0.06">
-            <origin xyz="0 0 0.15" rpy="0 0 0"/>
+            <origin xyz="0 0 0.1" rpy="0 0 0"/>
         </xacro:inertial_box>
     </link>
 
@@ -39,8 +39,8 @@
     <joint name="bodyjoint_1" type="revolute">
         <parent link="bodylink_1"/>
         <child link="bodylink_2"/>
-        <origin xyz="0 0 0.2" rpy="0 0 0"/>
-        <axis xyz="0 1 0"/>
+        <origin xyz="0 0 0.2" rpy="-${pi/2} 0 0" />
+        <axis xyz="0 0 1"/>
         <limit effort="10" lower="-90" upper="90" velocity="5"/>
     </joint>
 
@@ -56,18 +56,16 @@
             <geometry><box size="0.25 0.35 0.55"/></geometry>
         </collision>
         <xacro:inertial_box mass="0.5" x="0.2" y="0.1" z="0.06">
-            <origin xyz="0 0 1" rpy="0 0 0"/>
+            <origin xyz="0 0 0.4" rpy="0 0 0"/>
         </xacro:inertial_box>
     </link>
 
-
-    <!-- body joint 2nd -->
+    <!--body joint 2nd-->
     <joint name="bodyjoint_2" type="revolute">
         <parent link="bodylink_2"/>
         <child link="bodylink_3"/>
-        <!--origin xyz="0 0 1" rpy="-${pi/2} 0 0" /-->
-        <origin xyz="0 0 0.8" rpy="0 0 0" />
-        <axis xyz="0 1 0"/>
+        <origin xyz="0 0 0.8" rpy="-${pi/2} 0 0" />
+        <axis xyz="0 0 1"/>
         <limit effort="10" lower="-90" upper="90" velocity="5"/>
     </joint>
 
@@ -83,16 +81,16 @@
             <geometry><box size="0.25 0.35 0.55"/></geometry>
         </collision>
         <xacro:inertial_box mass="0.5" x="0.2" y="0.1" z="0.06">
-            <origin xyz="0 0 1" rpy="0 0 0"/>
+            <origin xyz="0 0 0.4" rpy="0 0 0"/>
         </xacro:inertial_box>
     </link>
 
-    <!-- body joint 3rd -->
+    <!--body joint 3rd-->
     <joint name="bodyjoint_3" type="revolute">
         <parent link="bodylink_3"/>
         <child link="bodylink_4"/>
-        <origin xyz="0 0 0.8" rpy="0 0 0" />
-        <axis xyz="0 1 0"/>
+        <origin xyz="0 0 0.8" rpy="-${pi/2} 0 0" />
+        <axis xyz="0 0 1"/>
         <limit effort="10" lower="-90" upper="90" velocity="5"/>
     </joint>
 
@@ -108,10 +106,9 @@
             <geometry><box size="0.25 0.35 0.65"/></geometry>
         </collision>
         <xacro:inertial_box mass="0.5" x="0.2" y="0.1" z="0.06">
-            <origin xyz="0 0 1" rpy="0 0 0"/>
+            <origin xyz="0 0 0.45" rpy="0 0 0"/>
         </xacro:inertial_box>
     </link>
-
 
     <!-- include camera xacro (사용자 필요 시) -->
     <!--xacro:include filename="lidar.xacro"/>

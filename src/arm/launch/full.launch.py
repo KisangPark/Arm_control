@@ -16,22 +16,18 @@ from launch_ros.substitutions import FindPackageShare
 import xacro
 
 def generate_launch_description():
+    package_name = "arm"
+
+    #robot state publisher, launch
+    rsp = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [os.path.join(get_package_share_directory(package_name), "launch", "xacro_load.launch.py")]
+        ),
+        launch_arguments={"use_sim_time": "true"}.items(),
+    )
 
     #workspace package
     pkg_path = os.path.join(get_package_share_directory('arm'))
-
-    #trying xacro instead of urdf!
-    xacro_file = os.path.join(pkg_path, "xacro", "arm.xacro")
-    robot_description = xacro.process_file(xacro_file)
-    params = {"robot_description": robot_description.toxml()}
-
-    #robot state publisher
-    robot_state_publisher = Node(
-                package="robot_state_publisher",
-                executable="robot_state_publisher",
-                #namespace="vision60", #vision60 namespace
-                output="screen",
-                parameters=[params],)
 
     #get_frame node
     get_frame = Node(
@@ -59,6 +55,7 @@ def generate_launch_description():
             get_frame,
             make_action,
             servo_control,
+            rsp,
         ]
     )
 
