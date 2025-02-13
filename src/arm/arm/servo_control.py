@@ -31,8 +31,8 @@ SERVO_MIN_DUTY    = 3    # duty for 0 degree
 
 def calc_duty(angle):
     #receive angle, calculate duty for gpio
-    duty = SERVO_MIN_DUTY+(angle*(SERVO_MAX_DUTY-SERVO_MIN_DUTY)/180.0)
-    return duty
+    duty = SERVO_MIN_DUTY+(np.array(angle)*(SERVO_MAX_DUTY-SERVO_MIN_DUTY)/180.0)
+    return duty.tolist()
 
 def select_action(index):
     """
