@@ -130,7 +130,7 @@ class SERVO_CONTROL(Node):
         #get self.angle, change into duty, servo control
         duty_list = calc_duty(self.servo_angle) #returns duty list
         
-        for i, servo in enumerate(self.servo1, self.servo2, self.servo3):
+        for i, servo in enumerate((self.servo1, self.servo2, self.servo3)):
             servo.ChangeDutyCycle(duty_list[i])
 
  
