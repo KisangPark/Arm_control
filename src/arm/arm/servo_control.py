@@ -128,7 +128,7 @@ class SERVO_CONTROL(Node):
 
     def servo_signal(self):
         #get self.angle, change into duty, servo control
-        duty_list = calc_duty(self.angle)
+        duty_list = calc_duty(self.servo_angle)
         
         for i, servo in enumerate(servo1, servo2, servo3):
             servo.ChangeDutyCycle(duty_list[i])
