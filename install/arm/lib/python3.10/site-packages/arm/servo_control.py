@@ -11,7 +11,7 @@ joint_names = ['bodyjoint_1', 'bodyjoint_2', 'bodyjoint_3']
 length = len(joint_names)
 
 
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 import numpy as np
 import rclpy
@@ -59,18 +59,18 @@ class SERVO_CONTROL(Node):
         qos_profile = QoSProfile(depth=10)
 
         #setup GPIO
-        #GPIO.setmode(GPIO.BOARD)
-        #GPIO.setup(servoPin1, GPIO.OUT)
-        #GPIO.setup(servoPin2, GPIO.OUT)
-        #GPIO.setup(servoPin3, GPIO.OUT)
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(servoPin1, GPIO.OUT)
+        GPIO.setup(servoPin2, GPIO.OUT)
+        GPIO.setup(servoPin3, GPIO.OUT)
 
         #servo motor definition
-        #servo1 = GPIO.PWM(servoPin1, 50)
-        #servo2 = GPIO.PWM(servoPin2, 50)
-        #servo3 = GPIO.PWM(servoPin3, 50)
-        #servo1.start(0)
-        #servo2.start(0)
-        #servo3.start(0)
+        servo1 = GPIO.PWM(servoPin1, 50)
+        servo2 = GPIO.PWM(servoPin2, 50)
+        servo3 = GPIO.PWM(servoPin3, 50)
+        servo1.start(0)
+        servo2.start(0)
+        servo3.start(0)
 
         #subscriber
         self.subscription = self.create_subscription(
@@ -111,7 +111,7 @@ class SERVO_CONTROL(Node):
             self.joint_state[i] = max(-3.14, min(3.14, self.joint_state[i] + value*3.14/180)) #cat
 
         #2) call gpio control method
-        #self.servo_signal()
+        self.servo_signal()
 
         #3) create message
         self.sai.data = np.float32(self.servo_angle).tolist()

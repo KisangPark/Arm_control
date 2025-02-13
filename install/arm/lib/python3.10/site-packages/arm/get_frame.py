@@ -96,7 +96,7 @@ class GET_FRAME(Node):
         #cv video capture
         #self.cap = cv2.VideoCapture(0) # '/dev/video1' #*********************************************************************************
         #alter: image of red box and green dot
-        self.image = cv2.imread('/home/kisangpark/Arm_control/src/arm/redbox_greendot.jpg')
+        self.image = cv2.imread('/home/kisang/Arm_control/src/arm/redbox_greendot.jpg')
 
         #subscriber
         self.subscription = self.create_subscription(
