@@ -75,6 +75,7 @@ class SERVO_CONTROL(Node):
 
         #initial time
         self.initial_time = time()
+        self.cnt = 0 #for action selection
 
         #subscriber
         self.subscription = self.create_subscription(
@@ -112,9 +113,20 @@ class SERVO_CONTROL(Node):
             self.servo_signal()
             return None
 
+        #generate action, between 13 and 26
+        if self.cnt < 100:
+            action_index = 13
+            self.cnt += 1
+        elif self.cnt < 200:
+            action_index =26
+            self.cnt += 1
+        else:
+            self.cnt = 0
+            action_index = 13
+
         #1) calculate self angle
         random_index = np.random.randint(0, high=26, size=1, dtype=int)
-        action_list = select_action(random_index[0]) #msg.data
+        action_list = select_action(action_index) #msg.data #random_index[0]
         self.get_logger().info("action list arrived")
         for i, value in enumerate(action_list):
             self.servo_angle[i] = max(0, min(180, self.servo_angle[i] + value)) #cat
