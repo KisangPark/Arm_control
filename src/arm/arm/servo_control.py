@@ -26,8 +26,8 @@ servoPin1          = 7
 servoPin2          = 11
 servoPin3          = 16
 
-SERVO_MAX_DUTY    = 9   # duty for 180 degree
-SERVO_MIN_DUTY    = 6    # duty for 0 degree
+SERVO_MAX_DUTY    = 12   # duty for 180 degree
+SERVO_MIN_DUTY    = 3    # duty for 0 degree
 
 
 def calc_duty(angle):
