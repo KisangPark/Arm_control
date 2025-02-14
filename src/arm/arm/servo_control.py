@@ -157,6 +157,7 @@ class SERVO_CONTROL(Node):
         
         for i, servo in enumerate((self.servo1, self.servo2, self.servo3)):
             servo.ChangeDutyCycle(duty_list[i])
+            time.sleep(1)
         self.get_logger().info("duty cycle: %f" %duty_list[0])
 
  
