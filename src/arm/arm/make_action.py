@@ -65,7 +65,7 @@ class MAKE_ACTION(Node):
         self.publisher = self.create_publisher(Int32, 'action', qos_profile)
 
     def forwarding(self, msg):
-        self.get_logger().info('state received, forwarding...')
+        #self.get_logger().info('state received, forwarding...')
         
         self.state = np.array(msg.data)
         self.state = torch.from_numpy(self.state)

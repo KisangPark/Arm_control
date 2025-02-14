@@ -116,7 +116,7 @@ class GET_FRAME(Node):
 
 
     def record_angle(self, msg):
-        self.get_logger().info('angle received from controller')
+        #self.get_logger().info('angle received from controller')
         self.servo_angle = msg.data
         #record angle from subscription
 
@@ -133,14 +133,14 @@ class GET_FRAME(Node):
             #get coordinate of arm tip, 1x2 vector
             arm_tip = detect_green_dot(frame)
 
-            self.get_logger().info("got box and dot")
+            #self.get_logger().info("got box and dot")
 
             # append all
             state = np.array(vertex_list).flatten().tolist()
             state += arm_tip
             try:
                 state += self.servo_angle #angle info received
-                self.get_logger().info("servo angle appended")
+                #self.get_logger().info("servo angle appended")
             except:
                 state += np.zeros(3).tolist()
 
