@@ -120,7 +120,7 @@ class SERVO_CONTROL(Node):
 
         #1) calculate self angle
         random_index = np.random.randint(0, high=26, size=1, dtype=int)
-        action_list = select_action(random_index[0]) #msg.data #random_index[0]
+        action_list = select_action(action_index) #msg.data #random_index[0]
         #self.get_logger().info("action list arrived")
         for i, value in enumerate(action_list):
             self.servo_angle[i] = max(0, min(180, self.servo_angle[i] + value)) #cat
