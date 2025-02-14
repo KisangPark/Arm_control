@@ -12,6 +12,7 @@ length = len(joint_names)
 
 
 import RPi.GPIO as GPIO
+from time import time
 
 import numpy as np
 import rclpy
@@ -72,6 +73,9 @@ class SERVO_CONTROL(Node):
         self.servo2.start(0)
         self.servo3.start(0)
 
+        #initial time
+        self.initial_time = time()
+
         #subscriber
         self.subscription = self.create_subscription(
             Int32,
@@ -101,6 +105,12 @@ class SERVO_CONTROL(Node):
         self.js.position = np.zeros(length).tolist()
 
     def action_callback(self,msg):
+
+        #initialize servos
+        current_time = time()
+        if current_time - self.initial_time < 5:
+            self.servo_signal()
+            return None
 
         #1) calculate self angle
         random_index = np.random.randint(0, high=26, size=1, dtype=int)

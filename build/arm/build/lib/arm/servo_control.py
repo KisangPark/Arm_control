@@ -31,8 +31,8 @@ SERVO_MIN_DUTY    = 3    # duty for 0 degree
 
 def calc_duty(angle):
     #receive angle, calculate duty for gpio
-    duty = SERVO_MIN_DUTY+(angle*(SERVO_MAX_DUTY-SERVO_MIN_DUTY)/180.0)
-    return duty
+    duty = SERVO_MIN_DUTY+(np.array(angle)*(SERVO_MAX_DUTY-SERVO_MIN_DUTY)/180.0)
+    return duty.tolist()
 
 def select_action(index):
     """
@@ -65,12 +65,12 @@ class SERVO_CONTROL(Node):
         GPIO.setup(servoPin3, GPIO.OUT)
 
         #servo motor definition
-        servo1 = GPIO.PWM(servoPin1, 50)
-        servo2 = GPIO.PWM(servoPin2, 50)
-        servo3 = GPIO.PWM(servoPin3, 50)
-        servo1.start(0)
-        servo2.start(0)
-        servo3.start(0)
+        self.servo1 = GPIO.PWM(servoPin1, 50)
+        self.servo2 = GPIO.PWM(servoPin2, 50)
+        self.servo3 = GPIO.PWM(servoPin3, 50)
+        self.servo1.start(0)
+        self.servo2.start(0)
+        self.servo3.start(0)
 
         #subscriber
         self.subscription = self.create_subscription(
@@ -128,9 +128,9 @@ class SERVO_CONTROL(Node):
 
     def servo_signal(self):
         #get self.angle, change into duty, servo control
-        duty_list = calc_duty(self.angle)
+        duty_list = calc_duty(self.servo_angle) #returns duty list
         
-        for i, servo in enumerate(servo1, servo2, servo3):
+        for i, servo in enumerate((self.servo1, self.servo2, self.servo3)):
             servo.ChangeDutyCycle(duty_list[i])
 
  
