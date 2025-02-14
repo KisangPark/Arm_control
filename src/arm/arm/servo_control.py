@@ -69,9 +69,9 @@ class SERVO_CONTROL(Node):
         self.servo1 = GPIO.PWM(servoPin1, 50)
         self.servo2 = GPIO.PWM(servoPin2, 50)
         self.servo3 = GPIO.PWM(servoPin3, 50)
-        self.servo1.start(5)
-        self.servo2.start(5)
-        self.servo3.start(5)
+        self.servo1.start(0)
+        self.servo2.start(0)
+        self.servo3.start(0)
 
         #subscriber
         self.subscription = self.create_subscription(
@@ -148,7 +148,7 @@ class SERVO_CONTROL(Node):
         
         for i, servo in enumerate((self.servo1, self.servo2, self.servo3)):
             servo.ChangeDutyCycle(duty_list[i])
-            time.sleep(1)
+        time.sleep(1)
         self.get_logger().info("duty cycle: %f" %duty_list[0])
         self.get_logger().info("angle info: %d" %self.servo_angle[0])
 
