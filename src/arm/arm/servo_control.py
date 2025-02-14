@@ -27,7 +27,7 @@ servoPin2          = 11
 servoPin3          = 16
 
 SERVO_MAX_DUTY    = 11   # duty for 180 degree
-SERVO_MIN_DUTY    =4    # duty for 0 degree
+SERVO_MIN_DUTY    = 4    # duty for 0 degree
 
 
 def calc_duty(angle):
@@ -159,6 +159,7 @@ class SERVO_CONTROL(Node):
             servo.ChangeDutyCycle(duty_list[i])
             time.sleep(1)
         self.get_logger().info("duty cycle: %f" %duty_list[0])
+        self.get_logger().info("angle info: %d" %self.servo_angle[0])
 
  
 
