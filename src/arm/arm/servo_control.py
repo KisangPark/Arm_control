@@ -22,17 +22,17 @@ from std_msgs.msg import Float32MultiArray
 from std_msgs.msg import Int32
 from rclpy.qos import QoSProfile
 
-servoPin1          = 8
-servoPin2          = 10
-servoPin3          = 12
+servoPin1          = 7
+servoPin2          = 11
+servoPin3          = 16
 
-SERVO_MAX_DUTY    = 10   # duty for 180 degree
-SERVO_MIN_DUTY    = 5    # duty for 0 degree
+SERVO_MAX_DUTY    = 11   # duty for 180 degree
+SERVO_MIN_DUTY    =4    # duty for 0 degree
 
 
 def calc_duty(angle):
     #receive angle, calculate duty for gpio
-    duty = SERVO_MIN_DUTY+(np.array(angle)*(SERVO_MAX_DUTY-SERVO_MIN_DUTY)/180.0)
+    duty = SERVO_MIN_DUTY+(np.array(angle)*(SERVO_MAX_DUTY - SERVO_MIN_DUTY)/180.0)
     return duty.tolist()
 
 def select_action(index):
