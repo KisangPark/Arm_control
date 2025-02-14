@@ -69,13 +69,9 @@ class SERVO_CONTROL(Node):
         self.servo1 = GPIO.PWM(servoPin1, 50)
         self.servo2 = GPIO.PWM(servoPin2, 50)
         self.servo3 = GPIO.PWM(servoPin3, 50)
-        self.servo1.start(0)
-        self.servo2.start(0)
-        self.servo3.start(0)
-
-        #initial time
-        self.initial_time = time.time()
-        self.cnt = 0 #for action selection
+        self.servo1.start(5)
+        self.servo2.start(5)
+        self.servo3.start(5)
 
         #subscriber
         self.subscription = self.create_subscription(
@@ -91,7 +87,9 @@ class SERVO_CONTROL(Node):
 
         #publish JointState for rviz & robot state publisher
         self.publisher_js = self.create_publisher(JointState, 'joint_states', qos_profile)
-
+        
+        #count for action
+        self.cnt = 0
 
         #initialize angle with 90
         # important: servo value is modified as 0~180 on code,
@@ -106,13 +104,6 @@ class SERVO_CONTROL(Node):
         self.js.position = np.zeros(length).tolist()
 
     def action_callback(self,msg):
-
-        #initialize servos
-        current_time = time.time()
-        if current_time - self.initial_time < 5:
-            self.servo_signal()
-            self.get_logger().info("zero angle initialize")
-            return None
 
         #generate action, between 13 and 26
         if self.cnt < 50:
@@ -129,7 +120,7 @@ class SERVO_CONTROL(Node):
 
         #1) calculate self angle
         random_index = np.random.randint(0, high=26, size=1, dtype=int)
-        action_list = select_action(action_index) #msg.data #random_index[0]
+        action_list = select_action(random_index[0]) #msg.data #random_index[0]
         #self.get_logger().info("action list arrived")
         for i, value in enumerate(action_list):
             self.servo_angle[i] = max(0, min(180, self.servo_angle[i] + value)) #cat
