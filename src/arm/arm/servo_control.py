@@ -12,7 +12,7 @@ length = len(joint_names)
 
 
 import RPi.GPIO as GPIO
-from time import time
+import time
 
 import numpy as np
 import rclpy
@@ -26,8 +26,8 @@ servoPin1          = 8
 servoPin2          = 10
 servoPin3          = 12
 
-SERVO_MAX_DUTY    = 12   # duty for 180 degree
-SERVO_MIN_DUTY    = 3    # duty for 0 degree
+SERVO_MAX_DUTY    = 10   # duty for 180 degree
+SERVO_MIN_DUTY    = 5    # duty for 0 degree
 
 
 def calc_duty(angle):
@@ -74,7 +74,7 @@ class SERVO_CONTROL(Node):
         self.servo3.start(0)
 
         #initial time
-        self.initial_time = time()
+        self.initial_time = time.time()
         self.cnt = 0 #for action selection
 
         #subscriber
@@ -108,18 +108,18 @@ class SERVO_CONTROL(Node):
     def action_callback(self,msg):
 
         #initialize servos
-        current_time = time()
+        current_time = time.time()
         if current_time - self.initial_time < 5:
             self.servo_signal()
             self.get_logger().info("zero angle initialize")
             return None
 
         #generate action, between 13 and 26
-        if self.cnt < 100:
+        if self.cnt < 50:
             action_index = 13
             self.cnt += 1
             self.get_logger().info("action 1313")
-        elif self.cnt < 200:
+        elif self.cnt < 100:
             action_index =26
             self.cnt += 1
             self.get_logger().info("action 2626")
@@ -157,6 +157,8 @@ class SERVO_CONTROL(Node):
         
         for i, servo in enumerate((self.servo1, self.servo2, self.servo3)):
             servo.ChangeDutyCycle(duty_list[i])
+        
+        time.sleep(1)
 
  
 
